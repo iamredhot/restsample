@@ -1,0 +1,125 @@
+# =============================================================================
+# Application Configuration
+# =============================================================================
+# Spring Boot reads this file automatically. YAML is preferred over .properties
+# for readability, especially with nested keys.
+
+spring:
+  application:
+    name: product-api
+
+  # ---------------------------------------------------------------------------
+  # DataSource configuration — H2 in-memory database
+  # ---------------------------------------------------------------------------
+  # "mem:productdb" = in-memory, named "productdb". Data is lost on restart.
+  # DB_CLOSE_DELAY=-1 keeps the DB alive as long as the JVM runs (without it,
+  # H2 may close the DB when the last connection closes during tests).
+  datasource:
+    url: jdbc:h2:mem:productdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # ---------------------------------------------------------------------------
+  # H2 Console — browser-based SQL client for debugging
+  # ---------------------------------------------------------------------------
+  # Access at http://localhost:8080/h2-console
+  # JDBC URL: jdbc:h2:mem:productdb   Username: sa   Password: (empty)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # ---------------------------------------------------------------------------
+  # JPA / Hibernate configuration
+  # ---------------------------------------------------------------------------
+  jpa:
+    # create-drop: Hibernate creates tables on startup, drops them on shutdown.
+    # Perfect for learning/dev. NEVER use in production (use Flyway/Liquibase).
+    hibernate:
+      ddl-auto: create-drop
+
+    # Show generated SQL in the console — invaluable for learning what Hibernate
+    # actually does. Disable in production (use logging categories instead).
+    show-sql: true
+
+    properties:
+      hibernate:
+        # Format the SQL output for readability
+        format_sql: true
+
+    # Defer DataSource initialization so that data.sql runs AFTER Hibernate
+    # creates the schema. Without this, data.sql runs before tables exist.
+    defer-datasource-initialization: true
+
+  # ---------------------------------------------------------------------------
+  # Jackson serialization defaults
+  # ---------------------------------------------------------------------------
+  jackson:
+    # Serialize Instant as ISO-8601 string ("2026-10-15T10:30:00Z"), not as
+    # a numeric epoch timestamp. This is the sane default for APIs.
+    serialization:
+      write-dates-as-timestamps: false
+
+    # Ignore unknown JSON properties during deserialization instead of failing.
+    # This follows Postel's Law: "be liberal in what you accept."
+    deserialization:
+      fail-on-unknown-properties: false
+
+    # Don't serialize null fields in responses — keeps JSON clean.
+    default-property-inclusion: non_null
+
+# ---------------------------------------------------------------------------
+# Server configuration
+# ---------------------------------------------------------------------------
+server:
+  port: 8080
+  # Use RFC 9457 ProblemDetail for Spring MVC error responses.
+  # Without this, Spring returns its legacy whitelabel error JSON.
+  error:
+    include-message: always
+
+# Enable ProblemDetail support for Spring MVC exceptions
+spring.mvc.problemdetails.enabled: true
+
+# ---------------------------------------------------------------------------
+# Actuator configuration
+# ---------------------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        # Expose health and info endpoints. In production, be selective.
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+# ---------------------------------------------------------------------------
+# springdoc / Swagger UI configuration
+# ---------------------------------------------------------------------------
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    # Show request duration in Swagger UI responses
+    display-request-duration: true
+  # Include default 200 response even when @ApiResponse is declared
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+logging:
+  level:
+    # See Spring MVC request mapping decisions
+    org.springframework.web: INFO
+    # See SQL queries and parameters (learning mode)
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    # Our application
+    com.example.product: DEBUG

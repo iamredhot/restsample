@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Spring Boot parent POM: provides dependency management (compatible versions
+        for all Spring libraries, Jackson, Hibernate, etc.), plugin configuration,
+        and sensible defaults. Using 3.5.7 — the latest stable available in the
+        local Maven cache. All Spring Boot 3.x versions share the same APIs,
+        annotations, and patterns used in this project.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.7</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>product-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Product Management API</name>
+    <description>REST API for managing products — learning project</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <!--
+            Pin maven-jar-plugin to 3.3.0 (locally cached). Spring Boot 3.5.7
+            parent defaults to 3.4.2, which isn't cached in this environment.
+        -->
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+    </properties>
+
+    <dependencies>
+        <!--
+            spring-boot-starter-web: Spring MVC + embedded Tomcat + Jackson.
+            This is the core starter for building REST APIs. It brings:
+            - DispatcherServlet (front controller)
+            - Jackson ObjectMapper (JSON serialization/deserialization)
+            - Embedded Tomcat (no external server needed)
+            - Spring MVC auto-configuration
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-data-jpa: Spring Data JPA + Hibernate ORM +
+            transaction management. Brings:
+            - EntityManager and JPA auto-configuration
+            - Spring Data repository abstractions (JpaRepository)
+            - @Transactional support
+            - Hibernate as the JPA provider
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            spring-boot-starter-validation: Hibernate Validator (Jakarta Bean
+            Validation implementation). Without this starter, @Valid and
+            constraint annotations (@NotBlank, @Positive, etc.) are silently
+            ignored — one of the most common Spring Boot gotchas.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+            H2 in-memory database. Pinned to 1.4.199 (available in local cache).
+            Perfect for learning — zero configuration, data resets on restart.
+            In production, replace with PostgreSQL or Oracle (see Phase 3 notes
+            on database portability).
+        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.199</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ==================== TEST DEPENDENCIES ==================== -->
+
+        <!--
+            spring-boot-starter-test: JUnit 5 + Mockito + AssertJ + MockMvc +
+            Spring TestContext + JSONPath + Hamcrest. Everything for testing.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                spring-boot-maven-plugin: builds executable fat JARs and
+                provides `mvn spring-boot:run` for quick startup.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
